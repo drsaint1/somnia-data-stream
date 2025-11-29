@@ -352,6 +352,10 @@ class DataStreamsService {
       const schemasToRegister = [];
       for (const { id, schema } of schemas) {
         const schemaId = await sdk.streams.computeSchemaId(schema);
+        if (!schemaId) {
+          console.warn(`⚠️ Could not compute schema ID for "${id}", skipping check`);
+          continue;
+        }
 
         // Check if schema is already registered (per official tutorial)
         const isRegistered = await sdk.streams.isDataSchemaRegistered(schemaId);
@@ -386,6 +390,11 @@ class DataStreamsService {
         let allRegistered = true;
         for (const { id, schema } of schemasToRegister) {
           const schemaId = await sdk.streams.computeSchemaId(schema);
+          if (!schemaId) {
+            console.warn(`⚠️ Could not re-compute schema ID for "${id}", skipping verification`);
+            allRegistered = false;
+            continue;
+          }
           const isNowRegistered = await sdk.streams.isDataSchemaRegistered(schemaId);
 
           if (isNowRegistered) {
